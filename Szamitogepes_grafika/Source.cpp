@@ -20,16 +20,18 @@ GLint hovered = -1;
 
 std::vector<glm::vec3> pointToDraw;
 
+glm::vec3 purple = glm::vec3(0.3f, 0.33f, 1.0f);
+
 static std::vector<glm::vec3> myPoints =
 {
-	glm::vec3(-0.75f, -0.75f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f),
-	glm::vec3(-0.75f, 0.25f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f),
-	glm::vec3(-0.25f, 0.75f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f),
-	glm::vec3(0.25f, 0.75f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f),
+	glm::vec3(-0.75f, -0.75f, 0.0f), purple,
+	glm::vec3(-0.75f, 0.25f, 0.0f), purple,
+	glm::vec3(-0.25f, 0.75f, 0.0f), purple,
+	glm::vec3(0.25f, 0.75f, 0.0f), purple,
 	glm::vec3(0.65f, 0.75f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f),
-	glm::vec3(0.25f, -0.75f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f),
-	glm::vec3(-0.5f, -0.5f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f),
-	glm::vec3(0.25f, 0.25f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f),
+	glm::vec3(0.25f, -0.75f, 0.0f), purple,
+	glm::vec3(-0.5f, -0.5f, 0.0f), purple,
+	glm::vec3(0.25f, 0.25f, 0.0f), purple,
 };
 
 /* Vertex buffer objektum és vertex array objektum az adattároláshoz.*/
@@ -185,7 +187,7 @@ void drawBezierCurve(std::vector<glm::vec3> controlPoints)
 			nextPoint.z = nextPoint.z + (Bernstein3(i, t) * controlPoints.at(i * 2).z);
 		}
 		pointToDraw.push_back(glm::vec3(nextPoint.x, nextPoint.y, nextPoint.z));
-		pointToDraw.push_back(glm::vec3(0.0, 1.0, 0.0));
+		pointToDraw.push_back(glm::vec3(0.6f, 0.8f, 0.2f));
 		t += increment;
 	}
 
@@ -202,7 +204,7 @@ void drawBezierCurve(std::vector<glm::vec3> controlPoints)
 			nextPoint.z = nextPoint.z + (Bernstein4(j, t) * controlPoints.at(i * 2).z);
 		}
 		pointToDraw.push_back(glm::vec3(nextPoint.x, nextPoint.y, nextPoint.z));
-		pointToDraw.push_back(glm::vec3(0.0, 0.1, 1.0));
+		pointToDraw.push_back(glm::vec3(0.25f, 0.56f, 0.7f));
 		t += increment;
 	}
 }
@@ -244,7 +246,7 @@ void cursorPosCallback(GLFWwindow* window, double xPos, double yPos)
 	if ((i = getActivePoint(myPoints, myPoints.size(), 0.05f, xPos, WIN_HEIGHT - yPos)) != -1) {
 		if (i % 2 == 0 && i != 4 * 2) {
 			hovered = i + (GLint)1;
-			myPoints.at(hovered) = glm::vec3(0.0f, 1.0f, 1.0f);
+			myPoints.at(hovered) = glm::vec3(0.8f, 0.8f, 1.0f);
 
 			glBindBuffer(GL_ARRAY_BUFFER, kontrollPontokVBO);
 			glBufferData(GL_ARRAY_BUFFER, myPoints.size() * sizeof(glm::vec3), myPoints.data(), GL_STATIC_DRAW);
@@ -252,7 +254,7 @@ void cursorPosCallback(GLFWwindow* window, double xPos, double yPos)
 		}
 	}
 	else if (hovered != -1) {
-		myPoints.at(hovered) = glm::vec3(0.0f, 0.0f, 1.0f);
+		myPoints.at(hovered) = purple;
 
 		glBindBuffer(GL_ARRAY_BUFFER, kontrollPontokVBO);
 		glBufferData(GL_ARRAY_BUFFER, myPoints.size() * sizeof(glm::vec3), myPoints.data(), GL_STATIC_DRAW);
