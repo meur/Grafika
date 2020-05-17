@@ -24,8 +24,8 @@ static std::vector<glm::vec3> myPoints =
 	glm::vec3(-0.75f, -0.75f, 0.0f),
 	glm::vec3(-0.75f, 0.25f, 0.0f),
 	glm::vec3(-0.25f, 0.75f, 0.0f),
-	glm::vec3(0.5f, 0.5f, 0.0f),
-	glm::vec3(0.5f, -0.5f, 0.0f),
+	glm::vec3(0.25f, 0.75f, 0.0f),
+	glm::vec3(0.65f, 0.75f, 0.0f),
 	glm::vec3(0.25f, -0.75f, 0.0f),
 	glm::vec3(-0.5f, -0.5f, 0.0f),
 	glm::vec3(0.25f, 0.25f, 0.0f),
@@ -238,10 +238,27 @@ void cursorPosCallback(GLFWwindow* window, double xPos, double yPos)
 	GLfloat xNorm = xPos / (WIN_WIDTH / 2) - 1.0f;
 	GLfloat yNorm = (WIN_HEIGHT - yPos) / (WIN_HEIGHT / 2) - 1.0f;
 
-	if (dragged >= 0)
+	if (dragged >= 0 && dragged != 4)
 	{
 		myPoints.at(dragged).x = xNorm;
 		myPoints.at(dragged).y = yNorm;
+
+		if (dragged == 2) {
+			int support = 3;
+			int target = 4;
+			GLfloat xDiff = (myPoints.at(support).x - xNorm) * 4 / 5;
+			GLfloat yDiff = (myPoints.at(support).y - yNorm) * 4 / 5;
+			myPoints.at(target).x = myPoints.at(support).x + xDiff;
+			myPoints.at(target).y = myPoints.at(support).y + yDiff;
+		}
+		else if (dragged == 3) {
+			int support = 2;
+			int target = 4;
+			GLfloat xDiff = (xNorm - myPoints.at(support).x) * 4 / 5;
+			GLfloat yDiff = (yNorm - myPoints.at(support).y) * 4 / 5;
+			myPoints.at(target).x = xNorm + xDiff;
+			myPoints.at(target).y = yNorm + yDiff;
+		}
 
 		glBindBuffer(GL_ARRAY_BUFFER, kontrollPontokVBO);
 		glBufferData(GL_ARRAY_BUFFER, myPoints.size() * sizeof(glm::vec3), myPoints.data(), GL_STATIC_DRAW);
