@@ -21,14 +21,14 @@ std::vector<glm::vec3> pointToDraw;
 
 static std::vector<glm::vec3> myPoints =
 {
-	glm::vec3(-0.75f, -0.75f, 0.0f),
-	glm::vec3(-0.75f, 0.25f, 0.0f),
-	glm::vec3(-0.25f, 0.75f, 0.0f),
-	glm::vec3(0.25f, 0.75f, 0.0f),
-	glm::vec3(0.65f, 0.75f, 0.0f),
-	glm::vec3(0.25f, -0.75f, 0.0f),
-	glm::vec3(-0.5f, -0.5f, 0.0f),
-	glm::vec3(0.25f, 0.25f, 0.0f),
+	glm::vec3(-0.75f, -0.75f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f),
+	glm::vec3(-0.75f, 0.25f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f),
+	glm::vec3(-0.25f, 0.75f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f),
+	glm::vec3(0.25f, 0.75f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f),
+	glm::vec3(0.65f, 0.75f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f),
+	glm::vec3(0.25f, -0.75f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f),
+	glm::vec3(-0.5f, -0.5f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f),
+	glm::vec3(0.25f, 0.25f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f),
 };
 
 /* Vertex buffer objektum és vertex array objektum az adattároláshoz.*/
@@ -179,9 +179,9 @@ void drawBezierCurve(std::vector<glm::vec3> controlPoints)
 		nextPoint = glm::vec3(0.0f, 0.0f, 0.0f);
 		for (int i = 0; i <= 3; i++)
 		{
-			nextPoint.x = nextPoint.x + (Bernstein3(i, t) * controlPoints.at(i).x);
-			nextPoint.y = nextPoint.y + (Bernstein3(i, t) * controlPoints.at(i).y);
-			nextPoint.z = nextPoint.z + (Bernstein3(i, t) * controlPoints.at(i).z);
+			nextPoint.x = nextPoint.x + (Bernstein3(i, t) * controlPoints.at(i * 2).x);
+			nextPoint.y = nextPoint.y + (Bernstein3(i, t) * controlPoints.at(i * 2).y);
+			nextPoint.z = nextPoint.z + (Bernstein3(i, t) * controlPoints.at(i * 2).z);
 		}
 		pointToDraw.push_back(glm::vec3(nextPoint.x, nextPoint.y, nextPoint.z));
 		t += increment;
@@ -195,9 +195,9 @@ void drawBezierCurve(std::vector<glm::vec3> controlPoints)
 		{
 			int offset = -3;
 			int j = i + offset;
-			nextPoint.x = nextPoint.x + (Bernstein4(j, t) * controlPoints.at(i).x);
-			nextPoint.y = nextPoint.y + (Bernstein4(j, t) * controlPoints.at(i).y);
-			nextPoint.z = nextPoint.z + (Bernstein4(j, t) * controlPoints.at(i).z);
+			nextPoint.x = nextPoint.x + (Bernstein4(j, t) * controlPoints.at(i * 2).x);
+			nextPoint.y = nextPoint.y + (Bernstein4(j, t) * controlPoints.at(i * 2).y);
+			nextPoint.z = nextPoint.z + (Bernstein4(j, t) * controlPoints.at(i * 2).z);
 		}
 		pointToDraw.push_back(glm::vec3(nextPoint.x, nextPoint.y, nextPoint.z));
 		t += increment;
@@ -238,22 +238,22 @@ void cursorPosCallback(GLFWwindow* window, double xPos, double yPos)
 	GLfloat xNorm = xPos / (WIN_WIDTH / 2) - 1.0f;
 	GLfloat yNorm = (WIN_HEIGHT - yPos) / (WIN_HEIGHT / 2) - 1.0f;
 
-	if (dragged >= 0 && dragged != 4)
+	if (dragged >= 0 && dragged != 4 * 2)
 	{
 		myPoints.at(dragged).x = xNorm;
 		myPoints.at(dragged).y = yNorm;
 
-		if (dragged == 2) {
-			int support = 3;
-			int target = 4;
+		if (dragged == 2 * 2) {
+			int support = 3 * 2;
+			int target = 4 * 2;
 			GLfloat xDiff = (myPoints.at(support).x - xNorm) * 4 / 5;
 			GLfloat yDiff = (myPoints.at(support).y - yNorm) * 4 / 5;
 			myPoints.at(target).x = myPoints.at(support).x + xDiff;
 			myPoints.at(target).y = myPoints.at(support).y + yDiff;
 		}
-		else if (dragged == 3) {
-			int support = 2;
-			int target = 4;
+		else if (dragged == 3 * 2) {
+			int support = 2 * 2;
+			int target = 4 * 2;
 			GLfloat xDiff = (xNorm - myPoints.at(support).x) * 4 / 5;
 			GLfloat yDiff = (yNorm - myPoints.at(support).y) * 4 / 5;
 			myPoints.at(target).x = xNorm + xDiff;
@@ -338,8 +338,10 @@ void init(GLFWwindow* window) {
 
 	glBindVertexArray(kontrollPontokVAO);
 	glBindBuffer(GL_ARRAY_BUFFER, kontrollPontokVBO);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -360,7 +362,7 @@ void cleanUpScene()
 
 void display(GLFWwindow* window, double currentTime) {
 
-	glClearColor(0.0, 0.0, 0.0, 1.0);
+	glClearColor(1.0, 1.0, 1.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // fontos lehet minden egyes alkalommal törölni!
 
 	// aktiváljuk a shader-program objektumunkat.
@@ -375,10 +377,12 @@ void display(GLFWwindow* window, double currentTime) {
 
 	glBindVertexArray(kontrollPontokVAO);
 	glPointSize(10.0f);
-	glDrawArrays(GL_POINTS, 0, myPoints.size());
+	glDrawArrays(GL_POINTS, 0, myPoints.size() / 2);
 
 	glLineWidth(1.0f);
-	glDrawArrays(GL_LINE_STRIP, 0, myPoints.size());
+	glDisableVertexAttribArray(1);
+	glDrawArrays(GL_LINE_STRIP, 0, myPoints.size() / 2);
+	glEnableVertexAttribArray(1);
 	/* Leválasztjuk, nehogy bármilyen érték felülíródjon.*/
 	glBindVertexArray(0);
 }
@@ -393,7 +397,7 @@ int main(void) {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
 	/* Próbáljuk meg létrehozni az ablakunkat. */
-	GLFWwindow* window = glfwCreateWindow(WIN_WIDTH, WIN_HEIGHT, "Bézier gorbe", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(WIN_WIDTH, WIN_HEIGHT, "Bezier gorbe", NULL, NULL);
 
 	/* Válasszuk ki az ablakunk OpenGL kontextusát, hogy használhassuk. */
 	glfwMakeContextCurrent(window);
