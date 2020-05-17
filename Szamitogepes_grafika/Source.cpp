@@ -12,7 +12,7 @@
 
 using namespace std;
 
-static int WIN_WIDTH = 900;
+static int WIN_WIDTH = 1500;
 static int WIN_HEIGHT = 900;
 
 GLint dragged = -1;
@@ -25,6 +25,7 @@ static std::vector<glm::vec3> myPoints =
 	glm::vec3(-0.5f, 0.5f, 0.0f),
 	glm::vec3(0.5f, -0.5f, 0.0f),
 	glm::vec3(0.5f, 0.5f, 0.0f),
+	glm::vec3(0.25f, 0.25f, 0.0f),
 };
 
 /* Vertex buffer objektum és vertex array objektum az adattároláshoz.*/
@@ -148,6 +149,17 @@ double Bernstein3(GLint i, GLfloat t)
 	}
 }
 
+double Bernstein4(GLint i, GLfloat t)
+{
+	switch (i)
+	{
+	case 0: return ((1 - t) * (1 - t) * (1 - t) * (1 - t));
+	case 1: return (4 * t * (1 - t) * (1 - t) * (1 - t));
+	case 2: return (6 * t * t * (1 - t) * (1 - t));
+	case 3: return (4 * t * t * t * (1 - t));
+	case 4: return (t * t * t * t);
+	}
+}
 
 void drawBezierCurve(std::vector<glm::vec3> controlPoints)
 {
@@ -157,16 +169,16 @@ void drawBezierCurve(std::vector<glm::vec3> controlPoints)
 	
 	glm::vec3 nextPoint;
 	GLfloat t = 0.0f;
-	GLfloat increment = 1.0f / 250.0f; /* hány darab szakaszból rakjuk össze a görbénket? */
+	GLfloat increment = 1.0f / 500.0f; /* hány darab szakaszból rakjuk össze a görbénket? */
 
 	while (t <= 1.0f)
 	{
 		nextPoint = glm::vec3(0.0f, 0.0f, 0.0f);
-		for (int i = 0; i <= 3; i++)
+		for (int i = 0; i <= 4; i++)
 		{
-			nextPoint.x = nextPoint.x + (Bernstein3(i, t) * controlPoints.at(i).x);
-			nextPoint.y = nextPoint.y + (Bernstein3(i, t) * controlPoints.at(i).y);
-			nextPoint.z = nextPoint.z + (Bernstein3(i, t) * controlPoints.at(i).z);
+			nextPoint.x = nextPoint.x + (Bernstein4(i, t) * controlPoints.at(i).x);
+			nextPoint.y = nextPoint.y + (Bernstein4(i, t) * controlPoints.at(i).y);
+			nextPoint.z = nextPoint.z + (Bernstein4(i, t) * controlPoints.at(i).z);
 		}
 
 		pointToDraw.push_back(glm::vec3(nextPoint.x, nextPoint.y, nextPoint.z));
