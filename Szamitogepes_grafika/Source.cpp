@@ -21,10 +21,13 @@ std::vector<glm::vec3> pointToDraw;
 
 static std::vector<glm::vec3> myPoints =
 {
-	glm::vec3(-0.5f, -0.5f, 0.0f),
-	glm::vec3(-0.5f, 0.5f, 0.0f),
-	glm::vec3(0.5f, -0.5f, 0.0f),
+	glm::vec3(-0.75f, -0.75f, 0.0f),
+	glm::vec3(-0.75f, 0.25f, 0.0f),
+	glm::vec3(-0.25f, 0.75f, 0.0f),
 	glm::vec3(0.5f, 0.5f, 0.0f),
+	glm::vec3(0.5f, -0.5f, 0.0f),
+	glm::vec3(0.25f, -0.75f, 0.0f),
+	glm::vec3(-0.5f, -0.5f, 0.0f),
 	glm::vec3(0.25f, 0.25f, 0.0f),
 };
 
@@ -174,13 +177,28 @@ void drawBezierCurve(std::vector<glm::vec3> controlPoints)
 	while (t <= 1.0f)
 	{
 		nextPoint = glm::vec3(0.0f, 0.0f, 0.0f);
-		for (int i = 0; i <= 4; i++)
+		for (int i = 0; i <= 3; i++)
 		{
-			nextPoint.x = nextPoint.x + (Bernstein4(i, t) * controlPoints.at(i).x);
-			nextPoint.y = nextPoint.y + (Bernstein4(i, t) * controlPoints.at(i).y);
-			nextPoint.z = nextPoint.z + (Bernstein4(i, t) * controlPoints.at(i).z);
+			nextPoint.x = nextPoint.x + (Bernstein3(i, t) * controlPoints.at(i).x);
+			nextPoint.y = nextPoint.y + (Bernstein3(i, t) * controlPoints.at(i).y);
+			nextPoint.z = nextPoint.z + (Bernstein3(i, t) * controlPoints.at(i).z);
 		}
+		pointToDraw.push_back(glm::vec3(nextPoint.x, nextPoint.y, nextPoint.z));
+		t += increment;
+	}
 
+	t = 0.0f;
+	while (t <= 1.0f)
+	{
+		nextPoint = glm::vec3(0.0f, 0.0f, 0.0f);
+		for (int i = 3; i <= 7; i++)
+		{
+			int offset = -3;
+			int j = i + offset;
+			nextPoint.x = nextPoint.x + (Bernstein4(j, t) * controlPoints.at(i).x);
+			nextPoint.y = nextPoint.y + (Bernstein4(j, t) * controlPoints.at(i).y);
+			nextPoint.z = nextPoint.z + (Bernstein4(j, t) * controlPoints.at(i).z);
+		}
 		pointToDraw.push_back(glm::vec3(nextPoint.x, nextPoint.y, nextPoint.z));
 		t += increment;
 	}
