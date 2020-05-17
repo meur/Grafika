@@ -185,6 +185,7 @@ void drawBezierCurve(std::vector<glm::vec3> controlPoints)
 			nextPoint.z = nextPoint.z + (Bernstein3(i, t) * controlPoints.at(i * 2).z);
 		}
 		pointToDraw.push_back(glm::vec3(nextPoint.x, nextPoint.y, nextPoint.z));
+		pointToDraw.push_back(glm::vec3(0.0, 1.0, 0.0));
 		t += increment;
 	}
 
@@ -201,6 +202,7 @@ void drawBezierCurve(std::vector<glm::vec3> controlPoints)
 			nextPoint.z = nextPoint.z + (Bernstein4(j, t) * controlPoints.at(i * 2).z);
 		}
 		pointToDraw.push_back(glm::vec3(nextPoint.x, nextPoint.y, nextPoint.z));
+		pointToDraw.push_back(glm::vec3(0.0, 0.1, 1.0));
 		t += increment;
 	}
 }
@@ -348,10 +350,12 @@ void init(GLFWwindow* window) {
 	Negyedik az adat normalizálása, ez maradhat FALSE jelen példában.
 	Az attribútum értékek hogyan következnek egymás után? Milyen lépésköz után találom a következõ vertex adatait?
 	Végül megadom azt, hogy honnan kezdõdnek az értékek a pufferben. Most rögtön, a legelejétõl veszem õket.*/
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
 
 	/* Engedélyezzük az imént definiált 0 indexû attribútumot. */
 	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
 
 	/* Leválasztjuk a vertex array objektumot és a puffert is.*/
 	glBindVertexArray(0);
@@ -393,7 +397,7 @@ void display(GLFWwindow* window, double currentTime) {
 	glBindVertexArray(VAO);
 
 	glLineWidth(4.0f);
-	glDrawArrays(GL_LINE_STRIP, 0, pointToDraw.size());
+	glDrawArrays(GL_LINE_STRIP, 0, pointToDraw.size() / 2);
 	glBindVertexArray(0);
 
 	glBindVertexArray(kontrollPontokVAO);
