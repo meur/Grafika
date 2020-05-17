@@ -16,6 +16,7 @@ static int WIN_WIDTH = 1500;
 static int WIN_HEIGHT = 900;
 
 GLint dragged = -1;
+GLint hovered = -1;
 
 std::vector<glm::vec3> pointToDraw;
 
@@ -223,7 +224,7 @@ GLint getActivePoint(vector<glm::vec3> p, GLint size, GLfloat sens, GLfloat x, G
 	glm::vec3 P = glm::vec3(xNorm, yNorm, 0.0f);
 
 	for (i = 0; i < size; i++) {
-		if (dist2(p[i], P) < s) {
+		if (dist2(p[i], P) < s && i % 2 == 0) {
 			return i;
 		}
 	}
@@ -238,7 +239,27 @@ void cursorPosCallback(GLFWwindow* window, double xPos, double yPos)
 	GLfloat xNorm = xPos / (WIN_WIDTH / 2) - 1.0f;
 	GLfloat yNorm = (WIN_HEIGHT - yPos) / (WIN_HEIGHT / 2) - 1.0f;
 
-	if (dragged >= 0 && dragged != 4 * 2)
+	if ((i = getActivePoint(myPoints, myPoints.size(), 0.05f, xPos, WIN_HEIGHT - yPos)) != -1) {
+		if (i % 2 == 0 && i != 4 * 2) {
+			hovered = i + (GLint)1;
+			myPoints.at(hovered) = glm::vec3(0.0f, 1.0f, 1.0f);
+
+			glBindBuffer(GL_ARRAY_BUFFER, kontrollPontokVBO);
+			glBufferData(GL_ARRAY_BUFFER, myPoints.size() * sizeof(glm::vec3), myPoints.data(), GL_STATIC_DRAW);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+		}
+	}
+	else if (hovered != -1) {
+		myPoints.at(hovered) = glm::vec3(0.0f, 0.0f, 1.0f);
+
+		glBindBuffer(GL_ARRAY_BUFFER, kontrollPontokVBO);
+		glBufferData(GL_ARRAY_BUFFER, myPoints.size() * sizeof(glm::vec3), myPoints.data(), GL_STATIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+		hovered = -1;
+	}
+
+	if (dragged >= 0 && dragged != 4 * 2 && dragged % 2 == 0)
 	{
 		myPoints.at(dragged).x = xNorm;
 		myPoints.at(dragged).y = yNorm;
@@ -278,7 +299,7 @@ void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 	double x, y;
 	glfwGetCursorPos(window, &x, &y);
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-		if ((i = getActivePoint(myPoints, myPoints.size(), 0.1f, x, WIN_HEIGHT - y)) != -1)
+		if ((i = getActivePoint(myPoints, myPoints.size(), 0.05f, x, WIN_HEIGHT - y)) != -1)
 		{
 			dragged = i;
 		}
